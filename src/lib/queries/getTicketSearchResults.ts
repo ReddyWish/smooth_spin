@@ -19,11 +19,12 @@ export async function getTicketSearchResults(searchText: string) {
     .where(
       or(
         ilike(tickets.title, `%${searchText}%`),
+        ilike(tickets.tech, `%${searchText}%`),
         ilike(customers.email, `%${searchText}%`),
         ilike(customers.phone, `%${searchText}%`),
         ilike(customers.city, `%${searchText}%`),
         ilike(customers.zip, `%${searchText}%`),
-        sql`lower(concat(${customers.firstName}, ' ', {customers.lastName})) LIKE ${`%${searchText.toLowerCase().replace(' ', '%')}%`}`,
+        sql`lower(concat(${customers.firstName}, ' ', ${customers.lastName})) LIKE ${`%${searchText.toLowerCase().replace(' ', '%')}%`}`,
       ),
     )
     .orderBy(asc(tickets.created_at));

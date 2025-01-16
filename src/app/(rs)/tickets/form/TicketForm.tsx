@@ -19,7 +19,6 @@ import { saveTicketAction } from '@/app/actions/saveTicketAction';
 import { useToast } from '@/hooks/use-toast';
 import { LoaderCircle } from 'lucide-react';
 import { DisplayServerActionResponse } from '@/components/DisplayServerActionResponse';
-import { saveCustomerAction } from '@/app/actions/saveCustomerAction';
 
 type TicketFormProps = {
   customer: selectCustomerSchemaType;
@@ -44,7 +43,7 @@ export default function TicketForm({
     title: ticket?.title || '',
     description: ticket?.description || '',
     completed: ticket?.completed || false,
-    tech: ticket?.tech ?? 'new-ticket@example.com',
+    tech: ticket?.tech.toLowerCase() ?? 'new-ticket@example.com',
   };
 
   const form = useForm<insertTicketSchemaType>({

@@ -8,13 +8,11 @@ export async function getCustomerSearchResults(searchText: string) {
     .from(customers)
     .where(
       or(
-        ilike(customers.firstName, `%${searchText}%`),
-        ilike(customers.lastName, `%${searchText}%`),
         ilike(customers.email, `%${searchText}%`),
         ilike(customers.phone, `%${searchText}%`),
         ilike(customers.city, `%${searchText}%`),
         ilike(customers.zip, `%${searchText}%`),
-        sql`lower(concat(${customers.firstName}, ' ', {customers.lastName})) LIKE ${`%${searchText.toLowerCase().replace(' ', '%')}%`}`,
+        sql`lower(concat(${customers.firstName}, ' ', ${customers.lastName})) LIKE ${`%${searchText.toLowerCase().replace(' ', '%')}%`}`,
       ),
     );
 
