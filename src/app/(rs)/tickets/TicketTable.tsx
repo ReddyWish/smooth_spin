@@ -7,6 +7,9 @@ import {
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
+  getFilteredRowModel,
+  getFacetedUniqueValues,
+  ColumnFiltersState,
 } from '@tanstack/react-table';
 import {
   Table,
@@ -17,8 +20,10 @@ import {
   TableHead,
 } from '@/components/ui/table';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { CircleCheckIcon, CircleXIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Filter from '@/components/react-table/Filter';
 
 type TicketTableProps = {
   data: TicketSearchResultType;
@@ -28,6 +33,8 @@ type RowType = TicketSearchResultType[0];
 
 export default function TicketTable({ data }: TicketTableProps) {
   const router = useRouter();
+
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>();
 
   const columnHeaderArray: Array<keyof RowType> = [
     'ticketDate',
@@ -83,13 +90,19 @@ export default function TicketTable({ data }: TicketTableProps) {
   const table = useReactTable({
     data,
     columns,
+    state: {
+      columnFilters,
+    },
     initialState: {
       pagination: {
         pageSize: 10,
       },
     },
+    onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
   return (
@@ -109,6 +122,11 @@ export default function TicketTable({ data }: TicketTableProps) {
                             header.getContext(),
                           )}
                     </div>
+                    {header.column.getCanFilter() ? (
+                      <div className="grid place-content-center">
+                        <Filter column={header.column} />
+                      </div>
+                    ) : null}
                   </TableHead>
                 ))}
               </TableRow>
@@ -142,6 +160,10 @@ export default function TicketTable({ data }: TicketTableProps) {
           </p>
         </div>
         <div className="space-x-1">
+          <Button variant="outline" onClick={() => table.resetColumnFilters()}>
+            Reset Filters
+          </Button>
+
           <Button
             variant="outline"
             onClick={() => table.previousPage()}
