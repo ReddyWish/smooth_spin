@@ -24,7 +24,7 @@ export function NavButtonMenu({
 }: NuvButtonMenuProps) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="rounded-full">
           <Icon className="h-[1.2rem] w-[1.2rem]" />
           <span className="sr-only">{label}</span>
@@ -33,7 +33,7 @@ export function NavButtonMenu({
 
       <DropdownMenuContent align="end">
         {choices.map((choice, index) => (
-          <DropdownMenuItem key={index} asChild>
+          <DropdownMenuItem key={choice.title} asChild>
             <Link href={choice.href}>{choice.title}</Link>
           </DropdownMenuItem>
         ))}

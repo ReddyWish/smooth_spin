@@ -1,6 +1,7 @@
 import CustomerSearch from '@/app/(rs)/customers/CustomerSearch';
 import { getCustomerSearchResults } from '@/lib/queries/getCustomerSearchResults';
 import CustomerTable from '@/app/(rs)/customers/CustomerTable';
+import { Button } from '@/components/ui/button';
 
 export const metadata = {
   title: 'Customer Search',
@@ -22,7 +23,11 @@ export default async function Customers({
     <>
       <CustomerSearch />
       {results.length ? (
-        <CustomerTable data={results} />
+        <>
+          <CustomerTable data={results} />
+          {/*<Button type="button">Click Me</Button>*/}
+          <h1>Hello</h1>
+        </>
       ) : (
         <p className="mt-4">No results found</p>
       )}
