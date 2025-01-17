@@ -22,7 +22,7 @@ import {
   TableHead,
 } from '@/components/ui/table';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   CircleCheckIcon,
   CircleXIcon,
@@ -55,7 +55,12 @@ export default function TicketTable({ data }: TicketTableProps) {
     },
   ]);
 
-  usePolling(searchParams.get('searchText'), 5000);
+  usePolling(searchParams.get('searchText'), 10000);
+
+  const pageIndex = useMemo(() => {
+    const page = searchParams.get('page');
+    return page ? parseInt(page) - 1 : 0;
+  }, [searchParams.get('page')]);
 
   const columnHeaderArray: Array<keyof RowType> = [
     'ticketDate',
@@ -136,9 +141,8 @@ export default function TicketTable({ data }: TicketTableProps) {
     state: {
       sorting,
       columnFilters,
-    },
-    initialState: {
       pagination: {
+        pageIndex,
         pageSize: 10,
       },
     },
@@ -197,38 +201,63 @@ export default function TicketTable({ data }: TicketTableProps) {
           </TableBody>
         </Table>
       </div>
-      <div className="flex justify-between items-center">
-        <div className="flex basis-1/3 items-center">
+      <div className="flex justify-between items-center gap-1 flex-wrap">
+        <div>
           <p className="whitespace-nowrap fond-bold">
             {`Page ${table.getState().pagination.pageIndex + 1} of ${table.getPageCount()}`}
             &nbsp;&nbsp;
             {`[${table.getFilteredRowModel().rows.length} ${table.getFilteredRowModel().rows.length !== 1 ? 'total results' : 'result'}]`}
           </p>
         </div>
-        <div className="space-x-1">
-          <Button variant="outline" onClick={() => table.resetColumnFilters()}>
-            Reset Filters
-          </Button>
+        <div className="flex flex-row gap-1">
+          <div className="flex flex-row gap-1">
+            <Button
+              variant="outline"
+              onClick={() => table.resetColumnFilters()}
+            >
+              Reset Filters
+            </Button>
 
-          <Button variant="outline" onClick={() => table.resetColumnFilters()}>
-            Reset Sorting
-          </Button>
+            <Button variant="outline" onClick={() => router.refresh()}>
+              Refresh Data
+            </Button>
 
-          <Button
-            variant="outline"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
+            <Button
+              variant="outline"
+              onClick={() => table.resetColumnFilters()}
+            >
+              Reset Sorting
+            </Button>
+          </div>
+          <div className="flex flex-row gap-1">
+            <Button
+              variant="outline"
+              onClick={() => {
+                const newIndex = table.getState().pagination.pageIndex - 1;
+                table.setPageIndex(newIndex);
+                const params = new URLSearchParams(searchParams.toString());
+                params.set('page', (newIndex + 1).toString());
+                router.replace(`?${params.toString()}`, { scroll: false });
+              }}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Previous
+            </Button>
 
-          <Button
-            variant="outline"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                const newIndex = table.getState().pagination.pageIndex + 1;
+                table.setPageIndex(newIndex);
+                const params = new URLSearchParams(searchParams.toString());
+                params.set('page', (newIndex + 1).toString());
+                router.replace(`?${params.toString()}`, { scroll: false });
+              }}
+              disabled={!table.getCanNextPage()}
+            >
+              Next
+            </Button>
+          </div>
         </div>
       </div>
     </div>
