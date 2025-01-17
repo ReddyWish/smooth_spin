@@ -32,6 +32,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Filter from '@/components/react-table/Filter';
+import { useSearchParams } from 'next/navigation';
+import { usePolling } from '@/hooks/usePolling';
 
 type TicketTableProps = {
   data: TicketSearchResultType;
@@ -42,6 +44,8 @@ type RowType = TicketSearchResultType[0];
 export default function TicketTable({ data }: TicketTableProps) {
   const router = useRouter();
 
+  const searchParams = useSearchParams();
+
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const [sorting, setSorting] = useState<SortingState>([
@@ -50,6 +54,8 @@ export default function TicketTable({ data }: TicketTableProps) {
       desc: false, //false for ascending
     },
   ]);
+
+  usePolling(searchParams.get('searchText'), 5000);
 
   const columnHeaderArray: Array<keyof RowType> = [
     'ticketDate',
