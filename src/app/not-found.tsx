@@ -12,7 +12,7 @@ export default function NotFound() {
     >
       <div className="flex flex-col items-center justify-center h-full text-center text-white bg-black/50">
         <h2 className="text-4xl font-bold">Page Not Found</h2>
-        <Link href="/" className="mt-4 text-lg underline">
+        <Link href="/tickets" className="mt-4 text-lg hover:underline">
           Return Home
         </Link>
       </div>
