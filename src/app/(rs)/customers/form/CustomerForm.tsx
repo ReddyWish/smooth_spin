@@ -11,43 +11,68 @@ import {
 } from '@/zod-schemas/customer';
 import { InputWithLabel } from '@/components/inputs/InputWithLabel';
 import { TextAreaWithLabel } from '@/components/inputs/TextAreaWithLabel';
-import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
 import { CheckboxWithLabel } from '@/components/inputs/CheckboxWithLabel';
 import { useAction } from 'next-safe-action/hooks';
 import { saveCustomerAction } from '@/app/actions/saveCustomerAction';
 import { useToast } from '@/hooks/use-toast';
 import { LoaderCircle } from 'lucide-react';
 import { DisplayServerActionResponse } from '@/components/DisplayServerActionResponse';
+import { useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
 
 type CustomerFormProps = {
   customer?: selectCustomerSchemaType;
+  isManager?: boolean | undefined;
 };
 
-export default function CustomerForm({ customer }: CustomerFormProps) {
-  const { getPermission, isLoading } = useKindeBrowserClient();
-  const isManager = !isLoading && getPermission('manager')?.isGranted;
-
+export default function CustomerForm({
+  customer,
+  isManager = false,
+}: CustomerFormProps) {
   const { toast } = useToast();
 
-  const defaultValues: insertCustomerSchemaType = {
+  const searchParams = useSearchParams();
+  const hasCustomerId = searchParams.has('customerId');
+
+  const emptyValues: insertCustomerSchemaType = {
     id: customer?.id || 0,
-    firstName: customer?.firstName || '',
-    lastName: customer?.lastName || '',
-    address1: customer?.address1 || '',
-    address2: customer?.address2 || '',
-    city: customer?.city || '',
-    zip: customer?.zip || '',
-    phone: customer?.phone || '',
-    email: customer?.email || '',
-    note: customer?.note || '',
-    active: customer?.active || true,
+    firstName: '',
+    lastName: '',
+    address1: '',
+    address2: '',
+    city: '',
+    zip: '',
+    phone: '',
+    email: '',
+    note: '',
+    active: true,
   };
+
+  const defaultValues: insertCustomerSchemaType = hasCustomerId
+    ? {
+        id: customer?.id || 0,
+        firstName: customer?.firstName || '',
+        lastName: customer?.lastName || '',
+        address1: customer?.address1 || '',
+        address2: customer?.address2 || '',
+        city: customer?.city || '',
+        zip: customer?.zip || '',
+        phone: customer?.phone || '',
+        email: customer?.email || '',
+        note: customer?.note || '',
+        active: customer?.active,
+      }
+    : emptyValues;
 
   const form = useForm<insertCustomerSchemaType>({
     mode: 'onBlur',
     resolver: zodResolver(insertCustomerSchema),
     defaultValues,
   });
+
+  useEffect(() => {
+    form.reset(hasCustomerId ? defaultValues : emptyValues);
+  }, [searchParams.get('customerId')]);
 
   const {
     execute: executeSave,
@@ -133,9 +158,7 @@ export default function CustomerForm({ customer }: CustomerFormProps) {
               className="h-40"
             />
 
-            {isLoading ? (
-              <p>Loading...</p>
-            ) : isManager && customer?.id ? (
+            {isManager && customer?.id ? (
               <CheckboxWithLabel<insertCustomerSchemaType>
                 fieldTitle="Active"
                 nameInSchema="active"
