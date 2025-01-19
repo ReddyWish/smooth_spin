@@ -25,8 +25,6 @@ export default async function Customers({
       {results.length ? (
         <>
           <CustomerTable data={results} />
-          {/*<Button type="button">Click Me</Button>*/}
-          <h1>Hello</h1>
         </>
       ) : (
         <p className="mt-4">No results found</p>

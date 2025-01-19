@@ -22,7 +22,7 @@ import {
   TableHead,
 } from '@/components/ui/table';
 import { useRouter } from 'next/navigation';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   CircleCheckIcon,
   CircleXIcon,
@@ -164,6 +164,17 @@ export default function TicketTable({ data }: TicketTableProps) {
     getSortedRowModel: getSortedRowModel(),
   });
 
+  useEffect(() => {
+    const currentPageIndex = table.getState().pagination.pageIndex;
+    const pageCount = table.getPageCount();
+
+    if (pageCount <= currentPageIndex && currentPageIndex > 0) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('page', '1');
+      router.replace(`?${params.toString()}`, { scroll: false });
+    }
+  }, [table.getState().columnFilters]);
+
   return (
     <div className="mt-6 flex flex-col gap-4">
       <div className="mt-6 rounded-lg overflow-hidden border border-border">
@@ -222,7 +233,7 @@ export default function TicketTable({ data }: TicketTableProps) {
       <div className="flex justify-between items-center gap-1 flex-wrap">
         <div>
           <p className="whitespace-nowrap fond-bold">
-            {`Page ${table.getState().pagination.pageIndex + 1} of ${table.getPageCount()}`}
+            {`Page ${table.getState().pagination.pageIndex + 1} of ${Math.max(1, table.getPageCount())}`}
             &nbsp;&nbsp;
             {`[${table.getFilteredRowModel().rows.length} ${table.getFilteredRowModel().rows.length !== 1 ? 'total results' : 'result'}]`}
           </p>

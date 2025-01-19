@@ -42,9 +42,15 @@ export default async function CustomerFormPage({
           </>
         );
       }
-      return <CustomerForm isManager={isManager} customer={customer} />;
+      return (
+        <CustomerForm
+          key={customerId}
+          isManager={isManager}
+          customer={customer}
+        />
+      );
     } else {
-      return <CustomerForm isManager={isManager} />;
+      return <CustomerForm key="new" isManager={isManager} />;
     }
   } catch (error) {
     if (error instanceof Error) {
